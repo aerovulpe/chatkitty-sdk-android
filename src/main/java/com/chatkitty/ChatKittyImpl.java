@@ -15,6 +15,9 @@
  */
 package com.chatkitty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +34,10 @@ import com.chatkitty.model.SessionNotStartedException;
 import com.chatkitty.model.channel.event.MessageReceivedEvent;
 import com.chatkitty.model.channel.response.GetChannelResponse;
 import com.chatkitty.model.channel.response.GetChannelsResult;
+import com.chatkitty.model.message.Message;
 import com.chatkitty.model.message.TextMessage;
+import com.chatkitty.model.message.response.GetMessageResponse;
+import com.chatkitty.model.message.response.GetMessagesResult;
 import com.chatkitty.model.session.response.SessionStartResult;
 import com.chatkitty.model.user.response.GetCurrentUserResult;
 import com.chatkitty.stompx.stompx.StompWebSocketClient;
@@ -116,6 +122,31 @@ public class ChatKittyImpl implements ChatKitty {
             GetChannelsResult result =
                 new GetChannelsResult(
                     resource.get_embedded().getChannels(), resource.get_relays().getNext());
+            callback.onSuccess(result);
+          }
+        });
+  }
+
+  @Override
+  public void getChannelMessages(Channel channel, ChatKittyCallback<GetMessagesResult> callback) {
+    if (client == null || session == null) {
+      // TODO - Should add more potential scenarios here.
+      callback.onError(new SessionNotStartedException());
+      return;
+    }
+
+    client.subscribeRelay(
+        channel.get_relays().getMessages(),
+        new WebSocketPagedClientCallBack<GetMessageResponse>(GetMessageResponse.class) {
+          @Override
+          void onParsedMessage(
+              PagedResource<GetMessageResponse> resource,
+              StompWebSocketClient client,
+              StompSubscription subscription) {
+            // TODO - should do this mapping somewhere else.
+            List<Message> messages = new ArrayList<>(resource.get_embedded().getMessages());
+            GetMessagesResult result =
+                new GetMessagesResult(messages, resource.get_relays().getNext());
             callback.onSuccess(result);
           }
         });

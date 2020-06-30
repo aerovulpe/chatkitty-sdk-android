@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.chatkitty.model.channel.response;
+package com.chatkitty.model.message.response;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.chatkitty.model.Channel;
+import com.chatkitty.model.message.Message;
 import com.chatkitty.pagination.PageIterator;
 
-public final class GetChannelsResult {
+public final class GetMessagesResult {
 
-  private final Iterator<Channel> iterator;
+  private final Iterator<Message> iterator;
 
   @Nullable private String nextDestination;
 
-  public GetChannelsResult(List<Channel> channels, @Nullable String nextDestination) {
-    this.iterator = channels.iterator();
+  public GetMessagesResult(List<Message> messages, @Nullable String nextDestination) {
+    this.iterator = messages.iterator();
     this.nextDestination = nextDestination;
   }
 
-  public PageIterator<Channel> iterator() {
-    return new PageIterator<Channel>() {
+  public PageIterator<Message> iterator() {
+    return new PageIterator<Message>() {
       @Override
       public boolean hasNext() {
         if (!iterator.hasNext() && nextDestination != null) {
@@ -45,7 +45,7 @@ public final class GetChannelsResult {
       }
 
       @Override
-      public Channel next() {
+      public Message next() {
         return iterator.next();
       }
     };

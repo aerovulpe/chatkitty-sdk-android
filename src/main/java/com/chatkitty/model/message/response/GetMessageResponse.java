@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.chatkitty.model.message;
+package com.chatkitty.model.message.response;
 
-public abstract class Message {
-  private int id;
+import java.util.List;
 
-  private String type;
+import com.chatkitty.model.message.TextMessage;
 
-  public int getId() {
-    return id;
+public class GetMessageResponse {
+  // TODO - Update this to support more than just TextMessages
+  private List<TextMessage> messages;
+
+  public List<TextMessage> getMessages() {
+    return messages;
   }
 
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
+  public void setMessages(List<TextMessage> messages) {
+    this.messages = messages;
   }
 }
