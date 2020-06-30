@@ -22,11 +22,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.chatkitty.listeners.channel.ChannelEventListener;
+import com.chatkitty.listeners.channel.ChannelEventListenerRegistration;
+import com.chatkitty.model.Channel;
 import com.chatkitty.model.CurrentUser;
 import com.chatkitty.model.PagedResource;
 import com.chatkitty.model.SessionNotStartedException;
+import com.chatkitty.model.channel.event.MessageReceivedEvent;
 import com.chatkitty.model.channel.response.GetChannelResponse;
 import com.chatkitty.model.channel.response.GetChannelsResult;
+import com.chatkitty.model.message.TextMessage;
 import com.chatkitty.model.session.response.SessionStartResult;
 import com.chatkitty.model.user.response.GetCurrentUserResult;
 import com.chatkitty.stompx.stompx.StompWebSocketClient;
@@ -114,6 +119,32 @@ public class ChatKittyImpl implements ChatKitty {
             callback.onSuccess(result);
           }
         });
+  }
+
+  @Override
+  public ChannelEventListenerRegistration registerChannelEventListener(
+      Channel channel, ChannelEventListener listener) {
+    if (client == null || session == null) {
+      // TODO - Proper Error Handling
+      return ChannelEventListenerRegistration.create();
+    }
+
+    // TODO - The message model should be able to support multiple messages.
+    StompSubscription subscription =
+        client.subscribe(
+            channel.get_topics().getMessages(),
+            new WebSocketClientCallBack<TextMessage>(TextMessage.class) {
+              @Override
+              void onParsedMessage(
+                  TextMessage resource,
+                  StompWebSocketClient client,
+                  StompSubscription subscription) {
+                MessageReceivedEvent event = new MessageReceivedEvent();
+                event.setMessage(resource);
+                listener.onMessageReceived(event);
+              }
+            });
+    return ChannelEventListenerRegistration.create(() -> client.unsubscribe(subscription));
   }
 
   private abstract static class WebSocketPagedClientCallBack<T>

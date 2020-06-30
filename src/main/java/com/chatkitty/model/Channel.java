@@ -19,7 +19,15 @@ public class Channel {
 
   private long id;
 
+  private String type;
+
   private String name;
+
+  private Relays _relays;
+
+  private Topics _topics;
+
+  private Destinations _destinations;
 
   public long getId() {
     return id;
@@ -35,5 +43,86 @@ public class Channel {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public Relays get_relays() {
+    return _relays;
+  }
+
+  public void set_relays(Relays _relays) {
+    this._relays = _relays;
+  }
+
+  public Topics get_topics() {
+    return _topics;
+  }
+
+  public void set_topics(Topics _topics) {
+    this._topics = _topics;
+  }
+
+  public Destinations get_destinations() {
+    return _destinations;
+  }
+
+  public void set_destinations(Destinations _destinations) {
+    this._destinations = _destinations;
+  }
+
+  public static class Topics {
+
+    private String messages;
+
+    public String getMessages() {
+      return messages;
+    }
+
+    public void setMessages(String messages) {
+      this.messages = messages;
+    }
+  }
+
+  public static class Destinations {
+
+    private String message;
+
+    public String getMessage() {
+      return message;
+    }
+
+    public void setMessage(String message) {
+      this.message = message;
+    }
+  }
+
+  public static class Relays {
+
+    private String self;
+
+    private String messages;
+
+    public String getSelf() {
+      return self;
+    }
+
+    public void setSelf(String self) {
+      this.self = self;
+    }
+
+    public String getMessages() {
+      return messages;
+    }
+
+    public void setMessages(String messages) {
+      this.messages = messages;
+    }
   }
 }
