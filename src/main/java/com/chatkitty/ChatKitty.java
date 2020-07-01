@@ -19,6 +19,8 @@ import com.chatkitty.listeners.channel.ChannelEventListener;
 import com.chatkitty.listeners.channel.ChannelEventListenerRegistration;
 import com.chatkitty.model.Channel;
 import com.chatkitty.model.channel.response.GetChannelsResult;
+import com.chatkitty.model.message.request.CreateTextMessageRequest;
+import com.chatkitty.model.message.response.CreateMessageResult;
 import com.chatkitty.model.message.response.GetMessagesResult;
 import com.chatkitty.model.session.response.SessionStartResult;
 import com.chatkitty.model.user.response.GetCurrentUserResult;
@@ -40,4 +42,9 @@ public interface ChatKitty {
 
   ChannelEventListenerRegistration registerChannelEventListener(
       Channel channel, ChannelEventListener listener);
+
+  void sendChannelMessage(
+      Channel channel,
+      CreateTextMessageRequest request,
+      ChatKittyCallback<CreateMessageResult> callback);
 }

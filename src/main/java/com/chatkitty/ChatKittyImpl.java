@@ -16,6 +16,7 @@
 package com.chatkitty;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
@@ -36,6 +37,8 @@ import com.chatkitty.model.channel.response.GetChannelResponse;
 import com.chatkitty.model.channel.response.GetChannelsResult;
 import com.chatkitty.model.message.Message;
 import com.chatkitty.model.message.TextMessage;
+import com.chatkitty.model.message.request.CreateTextMessageRequest;
+import com.chatkitty.model.message.response.CreateMessageResult;
 import com.chatkitty.model.message.response.GetMessageResponse;
 import com.chatkitty.model.message.response.GetMessagesResult;
 import com.chatkitty.model.session.response.SessionStartResult;
@@ -176,6 +179,38 @@ public class ChatKittyImpl implements ChatKitty {
               }
             });
     return ChannelEventListenerRegistration.create(() -> client.unsubscribe(subscription));
+  }
+
+  @Override
+  public void sendChannelMessage(
+      Channel channel,
+      CreateTextMessageRequest request,
+      ChatKittyCallback<CreateMessageResult> callback) {
+    if (client == null || session == null) {
+      // TODO - Proper Error Handling
+      callback.onError(new SessionNotStartedException());
+      return;
+    }
+
+    client.subscribe(
+        channel.get_topics().getMessages(),
+        new WebSocketClientCallBack<TextMessage>(TextMessage.class) {
+          @Override
+          void onParsedMessage(
+              TextMessage resource, StompWebSocketClient client, StompSubscription subscription) {
+            CreateMessageResult result = new CreateMessageResult();
+            result.setMessage(resource);
+            callback.onSuccess(result);
+            client.unsubscribe(subscription);
+          }
+        });
+    
+    // TODO - We should move object mapping to outside the StompX library.
+    try {
+      client.sendPayload(channel.get_destinations().getMessage(), request, false);
+    } catch (JsonProcessingException exception) {
+      exception.printStackTrace();
+    }
   }
 
   private abstract static class WebSocketPagedClientCallBack<T>
